@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <title>Lewisham Coronavirus Data</title>
+    <!-- Bootstrap -->
+    <!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100;300;400;500;700;900&display=swap" rel="stylesheet"> 
+</head>
+
+<body>
+        <% let d = JSON.parse(data) %>  
+        
+        <div class="main-container grid-container">
+
+        <div class="heading-container container">
+            <h1 class="title">Daily Update</h2>
+            <div class="divider">
+                <hr>
+            </div>
+
+            <div class="area bold"><%= d.body[0].areaName %> </div>
+
+            <div class="specimen">People tested positive by specimen date </div>
+            <div class="date">Seven Days to <%= new Date().toLocaleDateString() %> </div>
+            <div class="rolling-sum"> 
+                <%= d.body[0].newCasesByPublishDateRollingSum %>
+            </div>
+
+            <div class="rolling-rate"> 
+                Rate per 100K of population: <span class="rolling-rate bold"><%= d.body[0].newCasesByPublishDateRollingRate %></span>
+            </div>
+
+            <div class="alert-level bold"> 
+                <% if (d.summary.alertLevelValue === -99) { %>
+                    <!-- Current Alert Level: National Lockdown -->
+                <% } else { %>
+                    Current Alert Level: Tier <%= d.summary.alertLevelValue %>
+                <% } %>
+
+            </div>
+
+            <div class="alert-msg bold">
+                <%= d.summary.alertLevelMsg %>
+            </div>
+
+            <div class="divider">
+                <hr>
+            </div>
+
+        </div>
+
+        <div class="chart-container container">
+
+            <div class="row">
+                <div id="chart-area"></div>
+            </div>
+
+            <div class="dropdown-select">
+                <p class="dropbtn">Select Testing Date Type:</p>
+                <select id="date-type">
+                <option value="1">Specimin Date</option>
+                <option value="2">Published Date</option>
+                </select>
+            </div>
+            <!-- <div class="row">
+                <div id="chart-area-2"></div>
+            </div> -->
+        </div>
+    </div>
+
+<!-- External JS libraries -->
+<!-- <script src=""></script> -->
+<script src="https://pagecdn.io/lib/d3/5.16.0/d3.min.js" crossorigin="anonymous"  ></script>
+<script>
+    let coronaData = '<%- data %>'
+    console.log("parsed", JSON.parse(coronaData))
+</script>
+
+<!-- Custom JS -->
+<script src="js/main.js"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

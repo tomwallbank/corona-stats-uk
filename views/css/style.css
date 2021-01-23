@@ -1,0 +1,155 @@
+/* HTML STYLING */
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  grid-gap: 10px;
+  /* background-color: #2196F3; */
+  /* padding: 10px; */
+  /* padding-left: 25px; */
+}
+
+.container {
+  padding-left: 25px;
+}
+
+.chart-container {
+  background-color: rgb(248, 248, 248);
+  color: rgb(107, 114, 118);
+}
+
+.axis-title, .legend-title {
+  fill: rgb(107, 114, 118);
+}
+
+hr {
+  width: 100%;
+  color: lightgray;
+  margin: auto;
+
+}
+
+.main-container {
+  width: 90%;
+  margin: auto;
+}
+
+.legend-title {
+  font-size: 1.0rem;
+  font-weight: bold;
+}
+
+.title {
+  font-size: 1.2rem;
+  font-family: 'Montserrat', sans-serif;
+  padding-bottom: 10px;
+}
+
+.date {
+  color: grey;
+  font-size: 0.75rem;
+  margin-bottom: -2.5px;
+  font-weight: 600;
+}
+
+.specimen{
+  font-size: 1rem;
+  font-weight: 900;
+  /* padding-bottom: 2.5px; */
+}
+
+.rolling-sum{
+  font-size: 1.2rem;
+  font-weight: 900;
+  padding-bottom: 10px;
+}
+
+.rolling-rate{
+  font-size: 1rem;
+  padding-bottom: 10px;
+}
+
+.area {
+  font-size: 2.0rem;
+  padding-bottom: 10px;
+}
+
+.alert-level {
+  font-size: 1.25rem;
+  margin-bottom: -10px;
+}
+
+.alert-msg {
+  font-size: 2.0rem;
+  padding-bottom: 15px;
+}
+
+.bold {
+  font-weight: 900;
+}
+
+.dropbtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  /* padding: 2px; */
+}
+
+#data-type {
+ font-size: 1rem;
+}
+
+.dropdown-select{
+  width:200px;
+  margin-top: -50px;
+  margin-left: 80px;
+  padding-bottom: 20px
+}
+/* D3 CHART STYLING */
+
+#chart-area {
+  margin-top: 10px
+}
+
+.axis-title {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus rect.cases, .focus text.cases-base-text, .legend rect.cases {
+  fill: grey;
+  stroke:grey;
+}
+
+.focus circle.cases, .focus text.cases-line-text, .legend circle.cases {
+  fill: red;
+}
+
+.focus circle.rolling, .focus text.rolling, .legend circle.rolling {
+  fill: green;
+}
+
+.focus circle.deaths, .focus text.deaths-line-text, .legend circle.deaths {
+  fill: blue;
+}
+
+.focus-box {
+  font-weight: 400;
+}
+
+.focus-heading {
+  font-weight: 600;
+}
+
+.alert-color {
+  opacity: 0.5;
+}
