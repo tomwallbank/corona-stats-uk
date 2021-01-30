@@ -8,20 +8,47 @@ app.set('view engine', 'ejs');
 
 app.get('/', async (req, res) => {
     // getData();
+    // let location = "areaType=region&areaCode=E12000007"
+    let location = "E09000023"
     try {
-        let data = await getData();
-        console.log(data["body"][0])
+        let data = await getData(location);
+        console.log(data.clean[0])
 
         res.render("index", {data: JSON.stringify(data)});
     }
-    catch {
+    catch (err){
+        console.log(err)
         res.send("error")
     }
 });
 
-app.listen(3000, () => console.log('Corona app listening on port 3000!'));
+app.get('/location', async (req, res) => {
+    // getData();
+    // console.log(req.query);
+    // console.log(req.param);
+    
+    // get the location from req
+    // break down areatype and areaname?
+    let location = req.query.param
+    // console.log(location)
+    
+    try {
+        // use location to get specific data from gov.uk
+        let data = await getData(location);
+        // console.log(data["body"][0]);
+        // send new data to the server
+        res.send({data: JSON.stringify(data)});
+    }
+    catch (err){
+        // console.log(err);
+        res.send("error");
+    }
+});
 
-const getData = async () => {
+const port = process.env.PORT;
+app.listen(port, () => console.log('Corona App listening on port', port));
+
+const getData = async (location) => {
 
     const structure = [
         "alertLevel",
@@ -36,46 +63,43 @@ const getData = async () => {
         "newCasesByPublishDateAgeDemographics"
     ]
 
-// https://api.coronavirus.data.gov.uk/v1/data?filters=areaType=utla&areaCode=E09000023&structure={"date":"date", "newCasesByPublishDateAgeDemographics":"newCasesByPublishDateAgeDemographics"}
-// https://api.coronavirus.data.gov.uk/v2/data?areaType=utla&areaCode=E09000023&metric=newCasesByPublishDateAgeDemographics&format=csv
     let structureString = "";
     structure.forEach(function(e){
      structureString += "metric" + "=" + e + "&";
     });
     structureString = structureString.trim("&");
-
+    // location = "E06000029"
     const url = (
-        'https://api.coronavirus.data.gov.uk/v2/data?' + 
-        'areaType=ltla&areaCode=E09000023&' + structureString + "format=json"
+        "https://api.coronavirus.data.gov.uk/v2/data?" + 
+        "areaType=ltla&areaCode=" + location + "&" + structureString + "format=json"
     );
-    console.log(url)
+    console.log(url);
 
     const { data, status, statusText } = await axios.get(url, { timeout: 10000 });
 
     if ( status >= 400 ){
-        console.log(statusText)
         throw new Error(statusText);
     } else if (status != 200){
-        console.log(status)
         throw new Error(statusText);        
     } else {
-        console.log(statusText)
+        console.log(data.length)
+        data.clean = await cleanData(data.body)
+        console.log(data.clean[0])
     }
-    console.log(status)
-    console.log(statusText)
-    data.summary = await summary(data)
-    return data
+
+    data.summary = await summary(data);
+    return data;
 };  // getData
 
 async function summary(data){
-    console.log("summary data")
+    // console.log("summary data");
     let rollingRate;
-    let arlertLevelValue;
+    let alertLevelValue;
     let alertLevelMsg;
     for (let i = 0; i < data["body"].length; i++){
 
         if (typeof data["body"][i]["newCasesBySpecimenDateRollingRate"] === "number"){
-            rollingRate = data["body"][i]["newCasesBySpecimenDateRollingRate"]
+            rollingRate = data["body"][i]["newCasesBySpecimenDateRollingRate"];
             break;
             // return {"rollingRate": rollingRate}
         }
@@ -84,8 +108,8 @@ async function summary(data){
         // console.log("here")
         if (typeof data["body"][i]["alertLevel"] === "number"){    
             // console.log("here2")    
-            alertLevelValue = data["body"][i]["alertLevelValue"]
-            alertLevelMsg = data["body"][i]["alertLevelName"]
+            alertLevelValue = data["body"][i]["alertLevelValue"];
+            alertLevelMsg = data["body"][i]["alertLevelName"];
             break;
         }
     }
@@ -95,5 +119,99 @@ async function summary(data){
         rollingRate: rollingRate,
         alertLevelValue: alertLevelValue,
         alertLevelMsg: alertLevelMsg
-    }
+    };
+}
+
+
+function cleanData(data){
+    console.log(data[0])
+
+    let tempAlertLevel = 6;
+    let tempAlertMsg = "National Lockdown";    
+    
+    let cleanData = data.reduce( (tot, curr, index, src) => {
+        let casesSpecDate;
+        let cases;
+        let cumDeaths;
+        let deaths;
+        // let sevenDayAverage;
+        let rollingRateSpecDate;
+        let rollingRate;
+        let alertLevel;
+        let alertMsg;
+
+        // Check if AlertLevel is null in the data or not
+        if (curr.alertLevel === null || curr.alertLevel === -99) {
+            let i = index -1;
+            alertLevel = tempAlertLevel;
+            alertMsg = tempAlertMsg;             
+        } else {
+            alertLevel = curr.alertLevelValue;
+            alertMsg = curr.alertLevelName;
+            tempAlertLevel = curr.alertLevelValue;
+            tempAlertMsg = curr.alertLevelName;         
+        }
+
+        // Cases - both by specimen and publish date
+        casesSpecDate = curr.newCasesBySpecimenDate;
+        cases = curr.newCasesByPublishDate;
+
+        // Rolling Rates, by specimen and publish dates, and logic to check if null or not //        
+        if (curr.newCasesBySpecimenDateRollingRate === null){
+            rollingRateSpecDate = 0;
+        } else {
+            rollingRateSpecDate = curr.newCasesBySpecimenDateRollingRate;   
+        }
+
+        if (curr.newCasesByPublishDateRollingRate === null){
+            rollingRate = 0;
+        } else {
+            rollingRate = curr.newCasesByPublishDateRollingRate;
+        }
+
+        // Daily Deaths
+        if (curr.newDeathsByDeathDate === null){
+            deaths = 0;
+        } else {
+            deaths = curr.newDeathsByDeathDate;
+        }
+
+        // Cumulative Deaths
+        if (curr.cumDeathsByDeathDate === null){
+            cumDeaths = 0;
+        } else {
+            cumDeaths = curr.cumDeathsByDeathDate;
+        }
+
+        let data = {
+            date: curr.date,
+            casesSpecDate: casesSpecDate,
+            cases: cases,
+            deaths: deaths,
+            cumDeaths: cumDeaths,
+            rollingRateSpecDate: rollingRateSpecDate,
+            rollingRate: rollingRate,
+            alertLevel: alertLevel,
+            alertMsg: alertMsg
+        }
+
+        if ( casesSpecDate + cases + cumDeaths + deaths + rollingRateSpecDate + rollingRate === 0){
+        } else {
+            tot.push(data)            
+        }
+        return tot;
+    },[])
+    
+    
+    cleanData.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(b.date) - new Date(a.date);
+    });
+    
+    cleanData.reverse()
+    
+    
+    console.log(cleanData[0])
+    return cleanData;
 }

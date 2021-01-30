@@ -2,7 +2,59 @@
 
 body {
   font-family: 'Noto Sans JP', sans-serif;
+  /*font-family: 'Montserrat', sans-serif;*/
   font-size: 12px;
+}
+
+#navbar {
+  width: 100%;
+  margin: auto;
+  height: 75px;
+  padding: 20px 0;
+  background-color: black; 
+  /*display: grid;*/
+  /*grid-template-columns: 10% 60% 20%;*/
+  /*grid-gap: 10px;*/
+}
+
+#navbar .title {
+  color: white;
+  font-size: 1.2rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  padding-top: 5px;
+  padding-left: 50px;
+}
+
+#navbar .container {
+  width: 100%;
+  padding-top: 25px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+
+
+
+.hidden {
+  display: none;
+}
+
+.list {
+  /*background-color: lightgray;*/
+  /*height: 10px;*/
+  width: 150px;
+}
+
+#searchBox{
+  width: 150px;
+}
+
+.list div {
+  width:100%;
+  font-size: 1.0rem;
+  height: 20px;
+  background:rgba(255,255,255,1.0)
 }
 
 .grid-container {
@@ -31,7 +83,6 @@ hr {
   width: 100%;
   color: lightgray;
   margin: auto;
-
 }
 
 .main-container {

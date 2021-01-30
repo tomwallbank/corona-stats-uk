@@ -3,9 +3,9 @@
 *    coronavirus data for Lewisham
 */
 
-let chartData = JSON.parse(coronaData)
-console.log(chartData)
-let data = chartData.body
+let chartData = d
+console.log("chartdata", chartData)
+let data = chartData.clean
 
 var margin = { left:80, right:80, top:50, bottom:100 };
 
@@ -53,20 +53,20 @@ g.append("text")
 // let testDate = 1
 let dropDown = document.getElementById("date-type");
 dropDown.addEventListener('change', (e) => {
-    console.log("Dropdown change, new value:", e.value)
-    console.log(`e.target.value = ${ e.target.value }`);
+    // console.log("Dropdown change, new value:", e.value)
+    // console.log(`e.target.value = ${ e.target.value }`);
     testDate = dropDown.value
-    drawChart();
+    drawChart(data);
 });
 
     // Clean data
     // console.log(data.length)
-    data.reverse();
 
-drawChart()
 
-function drawChart(){
+drawChart(data)
 
+function drawChart(data){
+    // data.reverse();
 //////////////////////////////////
 // REMOVE OLD STUFF
 ///////////////
@@ -75,121 +75,12 @@ svg.selectAll("circles").remove()
 svg.selectAll("path").remove()
 g.selectAll("g").remove()
 ////////////////////////
-
+    let cleanData = data
 // (chartData).then(function(data)
     let tempAlertLevel = 6;
     let tempAlertMsg = "National Lockdown";
-    console.log("data:", data)
-
-    let cleanData = data.reduce( (tot, curr, index, src) => {
-        let cases;
-        let cumDeaths;
-        let deaths;
-        let sevenDayAverage;
-        let rollingRate;
-        let alertLevel;
-        let alertMsg;
-
-        testDate = dropDown.value;
-
-        if (curr.alertLevel === null || curr.alertLevel === -99) {
-            let i = index -1
-            alertLevel = tempAlertLevel;
-            alertMsg = tempAlertMsg;             
-        } else {
-            alertLevel = curr.alertLevelValue;
-            alertMsg = curr.alertLevelName;
-            tempAlertLevel = curr.alertLevelValue;
-            tempAlertMsg = curr.alertLevelName;         
-        }
-        console.log(alertLevel) 
-
-        if (testDate === "1"){
-            cases = curr.newCasesBySpecimenDate;
-            if (curr.newCasesBySpecimenDateRollingRate === null){
-                rollingRate = 0;
-            } else {
-                rollingRate = curr.newCasesBySpecimenDateRollingRate   
-            }
-        } else {
-            cases = curr.newCasesByPublishDate;
-            if (curr.newCasesByPublishDateRollingRate === null){
-                rollingRate = 0;
-            } else {
-                rollingRate = curr.newCasesByPublishDateRollingRate;
-            }
-        }
-
-        // Cumulative Cases
-        // cumCases = curr.cumCasesByPublishDate;
-        // if (curr.cumCasesByPublishDate === null){
-        //     if (curr.cumCasesBySpecimenDate === null){
-        //         cumCases = 0;
-        //     } else {
-        //         cumCases = curr.cumCasesBySpecimenDate;
-        //     }
-        // } else {
-        //     cumCases = curr.cumCasesByPublishDate;
-        // }
-
-        // Daily Deaths
-        // deaths = curr.newDeathsByDeathDate;
-        if (curr.newDeathsByDeathDate === null){
-            deaths = 0;
-        } else {
-            deaths = curr.newDeathsByDeathDate;
-        }
-
-        // Cumulative Deaths
-        if (curr.cumDeathsByDeathDate === null){
-            cumDeaths = 0;
-            // let i = index - 1;
-            // if (src[i]){
-            //     cumDeaths = src[i]["cumDeathsByDeathDate"];
-            // } else {
-            //     cumDeaths = 0;
-            // }
-        } else {
-            cumDeaths = curr.cumDeathsByDeathDate;
-        }
-
-        try {
-            // console.log(tot[index -1 ]["cases"])
-            sevenDayAverage = ( 
-                tot[index - 1 ]["cases"] + 
-                tot[index - 2 ]["cases"] + 
-                tot[index - 3 ]["cases"] + 
-                tot[index - 4 ]["cases"] + 
-                tot[index - 5 ]["cases"] +
-                tot[index - 6 ]["cases"] +
-                tot[index - 7 ]["cases"]
-            ) / 7
-            console.log("7 day average:", sevenDayAverage.toFixed(2))
-        } catch {
-            sevenDayAverage = 0;
-        }
-
-        let data = {
-            date: curr.date,
-            cases: cases,
-            deaths: deaths,
-            cumDeaths: cumDeaths,
-            sevenDayAverage: sevenDayAverage,
-            rollingRate: rollingRate,
-            alertLevel: alertLevel,
-            alertMsg: alertMsg
-        }
-
-        if ( cases + cumDeaths + deaths + sevenDayAverage + rollingRate === 0){
-            // console.log(cumCases + cases + cumDeaths + deaths + sevenDayAverage + rollingRate)
-        } else {
-            // console.log(cumCases + cases + cumDeaths + deaths + sevenDayAverage + rollingRate)
-            tot.push(data)            
-        }
-        return tot;
-    },[])
-
-    console.log("cleanData", cleanData)
+    // console.log("data:", data)
+    
     // X Scale
     var x = d3.scaleBand()
         .domain(cleanData.map(function(d){ return d.date }))
@@ -218,7 +109,7 @@ g.selectAll("g").remove()
         // .tickFormat(d3.time.format('%M'))
         .tickValues(x.domain().filter(function(d,i){
             if (d.slice(8,10) === "01"){
-                console.log(d)
+                // console.log(d)
                 return d3.timeFormat('%Y')(d)
                 // return i            
             }  
@@ -440,7 +331,7 @@ g.selectAll("g").remove()
         let y0 = coordinates[1];
         let i = Math.round(x0*(cleanData.length/width)+1)
         let d = cleanData[i]
-        console.log(d.alertLevel)
+        // console.log(d.alertLevel)
         focus.select(".rolling-line-hover").attr("cx", x(d.date) )
         focus.select(".rolling-line-hover").attr("cy", y2(d.rollingRate))
         focus.select(".rolling-line-text").attr("x", x(d.date) )
