@@ -16,11 +16,12 @@
         <div id="navbar">
       
             <div class="container">
-                <div class="title">Select Local Authority Area:</div>                
+                <div class="title">Search Local Authority Area:</div>                
 
                 <div id="searchContainer">
-                    <input type="text" id="searchBox" name="search">
-                    <div id="list" class="hidden list"></div>                
+                    <input type="text" id="searchBox" name="search" autocomplete='off' autofocus>
+                    <div id="list" class="hidden list"></div>  
+
                 </div>
             
             </div>
@@ -82,6 +83,7 @@
 <!-- Internal JS -->
 <script>
     let d = JSON.parse('<%- data %>')
+    let locationCode = d.summary.areaCode;
 
     updateText(d);
     
@@ -93,7 +95,7 @@
         rollingSum.innerHTML = d.body[0].newCasesByPublishDateRollingSum
     
         let rollingRate = document.querySelector("#rollingRate")
-        rollingSum.innerHTML = d.body[0].newCasesByPublishDateRollingRate
+        rollingRate.innerHTML = d.body[0].newCasesByPublishDateRollingRate
         
         let alertLevel = document.querySelector("#alertLevel")
         let alertLevelValue = document.querySelector("#alertLevelValue")
@@ -110,57 +112,98 @@
     }
     
     let search = document.querySelector("#searchBox")
-    let ul = document.querySelector("#list")
+    let listDiv = document.querySelector("#list")
     
-    search.addEventListener("keyup", function(){
-        removeAllChildNodes(ul);
-
-        console.log("keyup")
+    // ADD EVENT LISTENERS 
+    search.addEventListener("keyup", function(e){
+        removeAllChildNodes(listDiv);
+        
+        console.log("keyup", e.key)
         if (search.value.length > 0) {
             
-            ul.classList.remove("hidden")            
+            listDiv.classList.remove("hidden")            
             let list = findLocation(areas, 'name', search.value);
+            console.log("list", list)
             for (let i = 0; i < 3; i++){
+                console.log("list", list)
                 let name = list[i]["name"];
                 let div = document.createElement("div")
+                div.innerHTML = name;
                 div.classList.add("location-list")
-                div.innerHTML = name
                 div.setAttribute("code", list[i]["code"])
+    
                 div.addEventListener("click", function(){
-                    search.value = name;
-                    removeAllChildNodes(ul);
-                    let url =  "/location?param=" + div.getAttribute("code");
-                        
-                    const XHR = new XMLHttpRequest();
-                
-                    XHR.open("GET", url);
-                    XHR.send();
-                
-                    XHR.onreadystatechange = function(){
-                        if (XHR.readyState == 4) {
-                            if(XHR.status === 200) {
-                                let d = JSON.parse(XHR.responseText)
-                                data = JSON.parse(d.data)
-                                drawChart(data.clean)
-                                updateText(data)
-                            } else {
-                                console.log("There was a problem");
-                            }
-                        }
-                    };
-                });
-                    
-                // })
-                ul.appendChild(div);
+                    submit(div, name)    
+                })
+
+                listDiv.appendChild(div);
             }
 
-            
-
         } else {
-            ul.classList.add("hidden")
+            listDiv.classList.add("hidden")
         }
-        console.log(search.value);
+        
+        if (e.key === 'Enter') {
+            console.log(e)
+            let div = ul.children
+            console.log("div")
+            submit(div, name)
+        } 
+        // console.log(search.value);
     })
+    
+    // DROP DOWN FOR DATE TYPE
+    let dropDown = document.getElementById("date-type");
+        dropDown.addEventListener('change', (e) => {
+            date = dropDown.value
+            // let code = div.getAttribute("code")
+            getRequest(locationCode, date)
+            // drawChart(data);
+    });
+    
+    // EVENT LISTENER FUNCTIONS
+    
+    function submit(div, name){
+        console.log("submit")
+        console.log("div:", div.innerHTML)
+        console.log("name", name)
+        search.value = div.innerHTML;
+        console.log("ul", listDiv)
+        removeAllChildNodes(listDiv);
+        let date = document.querySelector("#date-type").value
+        let code = div.getAttribute("code");
+        locationCode = code;
+        getRequest(code, date)
+    };
+    
+    
+    // AJAX GET REQUET
+    function getRequest(code, date){
+        let url =  "/location?location=" + locationCode +  "&date=" + date;
+        console.log(url)
+            
+        const XHR = new XMLHttpRequest();
+    
+        XHR.open("GET", url);
+        XHR.send();
+    
+        XHR.onreadystatechange = function(){
+            if (XHR.readyState == 4) {
+                if(XHR.status === 200) {
+                    let d = JSON.parse(XHR.responseText)
+                    data = JSON.parse(d.data)
+                    // UPDATE CHART
+                    drawChart(data.clean)
+                    
+                    // UPDATE TEXT
+                    updateText(data)
+                } else {
+                    console.log("There was a problem");
+                }
+            }
+        };        
+        
+    }
     
     let areas = [
         {"code":"E06000001","name":"Hartlepool"},
@@ -480,25 +523,17 @@
         {"code":"E09000033","name":"Westminster"}
     ]
     
+    // SEARCH FULL ARRAY OF LOCATIONS AND RETURN LIST OF MATCHES
     function findLocation(array, key, value) {
-        console.log("find location")
-        console.log(value)
-        console.log()
-        let len = value.length;
         let list = []
         for (var i = 0; i < array.length; i++) {
-            // console.log(array[i][key])
-            let k = array[i][key].slice(0, len)
-            // console.log(k)
+            let k = array[i][key].slice(0, value.length)
             if (k.toLowerCase() === value.toLowerCase()) {
-                // console.log("match")
                 list.push(array[i])
             }
         }
-        // console.log("list", list)
         return list;
     }
-    
     
     function removeAllChildNodes(parent) {
         while (parent.firstChild) {

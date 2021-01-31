@@ -11,7 +11,7 @@ app.get('/', async (req, res) => {
     // let location = "areaType=region&areaCode=E12000007"
     let location = "E09000023"
     try {
-        let data = await getData(location);
+        let data = await getData(location, 1);
         console.log(data.clean[0])
 
         res.render("index", {data: JSON.stringify(data)});
@@ -29,12 +29,14 @@ app.get('/location', async (req, res) => {
     
     // get the location from req
     // break down areatype and areaname?
-    let location = req.query.param
+    console.log(req.query)
+    let location = req.query.location;
+    let dateType = req.query.date;
     // console.log(location)
     
     try {
         // use location to get specific data from gov.uk
-        let data = await getData(location);
+        let data = await getData(location, dateType);
         // console.log(data["body"][0]);
         // send new data to the server
         res.send({data: JSON.stringify(data)});
@@ -48,7 +50,7 @@ app.get('/location', async (req, res) => {
 const port = process.env.PORT;
 app.listen(port, () => console.log('Corona App listening on port', port));
 
-const getData = async (location) => {
+const getData = async (location, dateType) => {
 
     const structure = [
         "alertLevel",
@@ -65,7 +67,7 @@ const getData = async (location) => {
 
     let structureString = "";
     structure.forEach(function(e){
-     structureString += "metric" + "=" + e + "&";
+        structureString += "metric" + "=" + e + "&";
     });
     structureString = structureString.trim("&");
     // location = "E06000029"
@@ -83,7 +85,7 @@ const getData = async (location) => {
         throw new Error(statusText);        
     } else {
         console.log(data.length)
-        data.clean = await cleanData(data.body)
+        data.clean = await cleanData(data.body, dateType)
         console.log(data.clean[0])
     }
 
@@ -118,12 +120,12 @@ async function summary(data){
         areaName: data["body"][0]["areaName"],
         rollingRate: rollingRate,
         alertLevelValue: alertLevelValue,
-        alertLevelMsg: alertLevelMsg
+        alertLevelMsg: alertLevelMsg,
+        areaCode: data["body"][0]["areaCode"]
     };
 }
 
-
-function cleanData(data){
+function cleanData(data, dateType){
     console.log(data[0])
 
     let tempAlertLevel = 6;
@@ -152,21 +154,23 @@ function cleanData(data){
             tempAlertMsg = curr.alertLevelName;         
         }
 
-        // Cases - both by specimen and publish date
-        casesSpecDate = curr.newCasesBySpecimenDate;
-        cases = curr.newCasesByPublishDate;
+        // Cases - 1 = specimen date and 2 = publish date
+        if (dateType == 1){
+            cases = curr.newCasesBySpecimenDate;            
 
-        // Rolling Rates, by specimen and publish dates, and logic to check if null or not //        
-        if (curr.newCasesBySpecimenDateRollingRate === null){
-            rollingRateSpecDate = 0;
-        } else {
-            rollingRateSpecDate = curr.newCasesBySpecimenDateRollingRate;   
-        }
+            if (curr.newCasesBySpecimenDateRollingRate === null){
+                rollingRate = 0;
+            } else {
+                rollingRate = curr.newCasesBySpecimenDateRollingRate;   
+            }
 
-        if (curr.newCasesByPublishDateRollingRate === null){
-            rollingRate = 0;
         } else {
-            rollingRate = curr.newCasesByPublishDateRollingRate;
+            cases = curr.newCasesByPublishDate;            
+            if (curr.newCasesByPublishDateRollingRate === null){
+                rollingRate = 0;
+            } else {
+                rollingRate = curr.newCasesByPublishDateRollingRate;
+            }
         }
 
         // Daily Deaths
@@ -185,17 +189,15 @@ function cleanData(data){
 
         let data = {
             date: curr.date,
-            casesSpecDate: casesSpecDate,
             cases: cases,
             deaths: deaths,
             cumDeaths: cumDeaths,
-            rollingRateSpecDate: rollingRateSpecDate,
             rollingRate: rollingRate,
             alertLevel: alertLevel,
             alertMsg: alertMsg
         }
 
-        if ( casesSpecDate + cases + cumDeaths + deaths + rollingRateSpecDate + rollingRate === 0){
+        if ( cases + cumDeaths + deaths + rollingRate === 0){
         } else {
             tot.push(data)            
         }
@@ -210,7 +212,7 @@ function cleanData(data){
     });
     
     cleanData.reverse()
-    
+    cleanData[cleanData.length-1]["cumDeaths"] = cleanData[cleanData.length-2]["cumDeaths"]
     
     console.log(cleanData[0])
     return cleanData;

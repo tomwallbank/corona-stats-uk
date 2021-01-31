@@ -7,17 +7,31 @@ let chartData = d
 console.log("chartdata", chartData)
 let data = chartData.clean
 
-var margin = { left:80, right:80, top:50, bottom:100 };
+// drawChart(data)
+
+// d3.select(window).on('resize', drawChart); 
+
+// function drawChart(data){
+    console.log("redraw chart and resize");
+    let margin = { left:80, right:80, top:50, bottom:100 };
+
+    let divWidth = parseInt(d3.select('#chart-area').style('width'), 10)
+    let divHeight = divWidth / 3 * 2;
+    console.log("width:", divWidth)
+    console.log("height:", divHeight)
 
 var width = 1000 - margin.left - margin.right,
     height = 425 - margin.top - margin.bottom;
+
+// let width = divWidth - margin.left - margin.right,
+//     height = divHeight - margin.top - margin.bottom;
     
-var svg = d3.select("#chart-area")
+let svg = d3.select("#chart-area")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
 
-var g = svg.append("g")
+let g = svg.append("g")
         .attr("transform", "translate(" + margin.left + 
             ", " + margin.top + ")");
 
@@ -49,20 +63,11 @@ g.append("text")
     .attr("transform", "rotate(-90)")
     .attr("class", "axis-title")
     .text("Cases");
+    
+//     drawChart(data)
+// }
 
-// let testDate = 1
-let dropDown = document.getElementById("date-type");
-dropDown.addEventListener('change', (e) => {
-    // console.log("Dropdown change, new value:", e.value)
-    // console.log(`e.target.value = ${ e.target.value }`);
-    testDate = dropDown.value
-    drawChart(data);
-});
-
-    // Clean data
-    // console.log(data.length)
-
-
+// drawAxis(data)
 drawChart(data)
 
 function drawChart(data){
