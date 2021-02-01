@@ -96,7 +96,7 @@ hr {
 }
 
 .main-container {
-  width: 90%;
+  width: 95%;
   margin: auto;
 }
 
@@ -213,4 +213,30 @@ hr {
 
 .alert-color {
   opacity: 0.5;
+}
+
+@media only screen and (max-width: 1200px) {
+  
+  /*.main-container {*/
+  /*  width: 100%;*/
+  /*  margin: auto;*/
+  /*}*/
+  #navbar .container {
+    width: 100%;
+    padding-top: 25px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+    
+    
+  .grid-container {
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto;
+    grid-gap: 10px;
+    /* background-color: #2196F3; */
+    /* padding: 10px; */
+    /* padding-left: 25px; */
+    }
 }

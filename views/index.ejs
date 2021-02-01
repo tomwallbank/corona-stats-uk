@@ -124,8 +124,9 @@
             listDiv.classList.remove("hidden")            
             let list = findLocation(areas, 'name', search.value);
             console.log("list", list)
-            for (let i = 0; i < 3; i++){
+            for (let i = 0; i < list.length; i++){
                 console.log("list", list)
+                console.log(i, list)
                 let name = list[i]["name"];
                 let div = document.createElement("div")
                 div.innerHTML = name;
@@ -143,10 +144,12 @@
             listDiv.classList.add("hidden")
         }
         
-        if (e.key === 'Enter') {
-            console.log(e)
-            let div = ul.children
-            console.log("div")
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            console.log("e", e)
+            // let listDiv = document.querySelector("#list")
+            let div = listDiv.firstChild
+            console.log(listDiv)
+            console.log("div", div)
             submit(div, name)
         } 
         // console.log(search.value);
@@ -162,7 +165,6 @@
     });
     
     // EVENT LISTENER FUNCTIONS
-    
     function submit(div, name){
         console.log("submit")
         console.log("div:", div.innerHTML)
@@ -175,7 +177,6 @@
         locationCode = code;
         getRequest(code, date)
     };
-    
     
     // AJAX GET REQUET
     function getRequest(code, date){
