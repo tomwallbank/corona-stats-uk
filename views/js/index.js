@@ -4,10 +4,11 @@
 */
 
 let data = d.clean
+console.log(data)
 
 let margin = { left:80, right:80, top:50, bottom:100 };
 
-var width = 1000 - margin.left - margin.right,
+let width = 1000 - margin.left - margin.right,
     height = 425 - margin.top - margin.bottom;
 
 let svg = d3.select("#chart-area")
@@ -75,28 +76,28 @@ let tempAlertLevel = 6;
 let tempAlertMsg = "National Lockdown";
 
 // X Scale
-var x = d3.scaleBand()
+let x = d3.scaleBand()
     .domain(cleanData.map(function(d){ return d.date }))
     .range([0, width])
     .padding(0.2);
 
 // Y Scale
-var y = d3.scaleLinear()
+let y = d3.scaleLinear()
     .domain([0, d3.max(cleanData, function(d) { return d.cumDeaths })])
     .range([height, 0]);
 
 // Y Scale2
-var y2 = d3.scaleLinear()
+let y2 = d3.scaleLinear()
     .domain([0, d3.max(cleanData, function(d) { return d.rollingRate })])
     .range([height, 0]);
 
 
-var colorScale = d3.scaleLinear()
+let colorScale = d3.scaleLinear()
     .domain([0, 6])
     .range(["white", "red"]);
 
 // X Axis
-var xAxisCall = d3.axisBottom(x)
+let xAxisCall = d3.axisBottom(x)
     .tickValues(x.domain().filter(function(d,i){
         if (d.slice(8,10) === "01"){
             // console.log(d)
@@ -116,7 +117,7 @@ g.append("g")
             .attr("dy", "0.75em")
 
 // Y Axis
-var yAxisCall = d3.axisLeft(y)
+let yAxisCall = d3.axisLeft(y)
     .tickFormat(function(d){ return d; });
 g.append("g")
     .attr("class", "y axis")
@@ -124,7 +125,7 @@ g.append("g")
     .call(yAxisCall);
 
 // Y Axis2
-var y2AxisCall = d3.axisRight(y2)
+let y2AxisCall = d3.axisRight(y2)
     .tickFormat(function(d){ return d; });
 g.append("g")
     .attr("transform", "translate(" + width + ",0)")
@@ -132,9 +133,9 @@ g.append("g")
     .call(y2AxisCall);
 
 // Bars
-var rectsG = g.append("g")
+let rectsG = g.append("g")
     .attr("class", "daily-cases-bar")
-var rects = rectsG.selectAll("rect")
+let rects = rectsG.selectAll("rect")
     .data(cleanData)
 
 rects.enter()
@@ -148,14 +149,13 @@ rects.enter()
         .attr("fill", "grey")
 
 // OVERLAY COLOUR BANDS REPRESENTING ALERT LEVEL
-
 // rects.enter()
 //     .append("rect")
 //         .attr("y", function(d){ return 0; })
 //         .attr("x", function(d){ return x(d.date) })
 //         .attr("alert", function(d) { return d.alertLevel})
 //         .attr("height", height)
-//         .attr("width", x.bandwidth)
+//         .attr("width", width/349)
 //         .attr("class", "alert-color")
 //         .attr("fill", function(d) { return colorScale(d.alertLevel)})
 
@@ -188,7 +188,7 @@ g.append("path")
 
 /******************************** Tooltip Code ********************************/
 
-var focus = g.append("g")
+let focus = g.append("g")
     .attr("class", "focus")
     .style("display", "none")
     .style("font-size", "10px")
@@ -218,7 +218,7 @@ focus.append("circle")
 focus.append("text")
     .attr("class", "rolling-line-text rolling")
 
-var focusLegend = focus.append("g")
+let focusLegend = focus.append("g")
 
 let focusWidth = 150;
 let focusHeight = 50;
@@ -227,7 +227,7 @@ focusLegend.append("rect")
     .style("stroke", "black")
     .style("fill", "white")
     .style("stroke-width", 1)
-    .attr("class", "focus-legend-rect focus-box")
+    .attr("class", "focus-legend-rect focus-box hidden")
     .attr("height", focusHeight)
     .attr("width", focusWidth)
 
@@ -251,7 +251,7 @@ focusLegend.append("text")
 let xOffset = 20
 let yOffset = 00
 
-var legend = g.append("g")
+let legend = g.append("g")
     .attr("class", "legend")
     // .style("display", "none")
     .style("font-size", "10px")
@@ -304,11 +304,15 @@ g.append("rect")
     .attr("width", width)
     .attr("height", height)
     .on("mouseover", function() { 
+        focus.select(".focus-legend-rect")
+            .classed("hidden", false)
         focus.style("display", null); 
         // legend.style("display", null); 
     })
     .on("mouseout", function() { 
         focus.style("display", "none"); 
+        focus.select(".focus-legend-rect")
+            .classed("hidden", true)
         // legend.style("display", "none"); 
     })
     .on("mousemove", mousemove);
@@ -319,9 +323,9 @@ function mousemove() {
     let coordinates= d3.mouse(this);
     let x0 = coordinates[0];
     let y0 = coordinates[1];
-    let i = Math.round(x0*(cleanData.length/width)+1)
+    let i = Math.floor(x0*((cleanData.length-1)/width))
     let d = cleanData[i]
-    // console.log(d.alertLevel)
+    
     focus.select(".rolling-line-hover").attr("cx", x(d.date) )
     focus.select(".rolling-line-hover").attr("cy", y2(d.rollingRate))
     focus.select(".rolling-line-text").attr("x", x(d.date) )
