@@ -34,8 +34,6 @@ body {
   grid-template-columns: 20% 80%;
 }
 
-
-
 .hidden {
   display: none;
 }
@@ -239,4 +237,23 @@ hr {
     /* padding: 10px; */
     /* padding-left: 25px; */
     }
+}
+
+.h1{
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-top: 25px;
+  /*color: dimgrey;*/
+}
+
+.h2{
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: dimgrey;
+}
+
+.h3{
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: black;
 }

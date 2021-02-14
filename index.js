@@ -3,7 +3,7 @@ const fs = require("fs");
 const express = require('express');
 const app = express();
 
-app.use(express.static('views'))
+app.use(express.static('./views'))
 app.set('view engine', 'ejs'); 
 
 app.get('/', async (req, res) => {
@@ -47,7 +47,8 @@ app.get('/location', async (req, res) => {
     }
 });
 
-const port = process.env.PORT;
+// const port = process.env.PORT;
+const port = 3001;
 app.listen(port, () => console.log('Corona App listening on port', port));
 
 const getData = async (location, dateType) => {

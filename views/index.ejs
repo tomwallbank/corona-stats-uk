@@ -20,7 +20,7 @@
 
                 <div id="searchContainer">
                     <input type="text" id="searchBox" name="search" autocomplete='off' autofocus>
-                    <div id="list" class="hidden list"></div>  
+                    <div id="list" class="hidden list"></div>
 
                 </div>
             
@@ -38,21 +38,21 @@
 
             <div class="area bold" id="areaName"></div>
 
-            <div class="specimen">People tested positive by specimen date </div>
-            <div class="date">Seven Days to <%= new Date().toLocaleDateString() %> </div>
-            <div class="rolling-sum" id="rollingSum"></div>
+            <div class="specimen h1">People tested positive by specimen date </div>
+            <div class="date h2">Seven Days to <%= new Date().toLocaleDateString('en-GB') %> </div>
+            <div class="rolling-sum h3" id="rollingSum"></div>
 
-            <div class="rolling-rate"> 
-                Rate per 100K of population: <span class="rolling-rate bold" id="rollingRate"></span>
+            <div class="rolling-rate h1"> 
+                Rate per 100K of population: <span class="rolling-rate bold h3" id="rollingRate"></span>
             </div>
 
-            <div class="alert-level bold"> 
-                Current Alert Level: <div id="alertLevel"></div>
-                <span id="alertLevelValue"></span>
+            <div class="alert-level bold h1"> 
+                Current Alert Level: <div class="h3" id="alertLevel"></div>
+                <span class="h3" id="alertLevelValue"></span>
 
             </div>
 
-            <div class="alert-msg bold" id="alertLevelMsg"></div>
+            <div class="alert-msg h1 bold" id="alertLevelMsg"></div>
 
             <div class="divider">
                 <hr>
@@ -105,10 +105,11 @@
         } else {
             alertLevel.innerHTML = d.summary.alertLevel
             alertLevel.innerHTML = d.summary.alertLevelValue            
+            let alertLevelMsg = document.querySelector("#alertLevelMsg")
+            alertLevelMsg.innerHTML = d.summary.alertLevelMsg;
         }
         
-        let alertLevelMsg = document.querySelector("#alertLevelMsg")
-        alertLevelMsg.innerHTML = d.summary.alertLevelMsg;
+
     }
     
     let search = document.querySelector("#searchBox")
@@ -546,7 +547,7 @@
 </script>
 
 <!-- Custom JS -->
-<script src="js/main.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
 
 </body>
 </html>
