@@ -184,21 +184,34 @@ hr {
   pointer-events: all;
 }
 
-.focus rect.cases, .focus text.cases-base-text, .legend rect.cases {
-  fill: grey;
-  stroke:grey;
+/*CASE RECTANGLES*/
+rect.cases, .focus rect.cases, .focus text.cases-base-text, .legend rect.cases {
+  fill: rgb(86, 148, 202)
 }
 
-.focus circle.cases, .focus text.cases-line-text, .legend circle.cases {
-  fill: red;
-}
+/**/
+/*.focus circle.cases, .focus text.cases-line-text, .legend circle.cases {*/
+/*  fill: red;*/
+/*}*/
 
+/*ROLLING RATE LINE*/
 .focus circle.rolling, .focus text.rolling, .legend circle.rolling {
-  fill: green;
+  fill: rgb(0, 48, 120);
 }
 
+/*CUMULATIVE DEATHS*/
 .focus circle.deaths, .focus text.deaths-line-text, .legend circle.deaths {
-  fill: blue;
+  fill: rgb(0, 48, 120);
+}
+
+/*DEATHS RECTANGLES*/
+rect.deaths, .focus rect.deaths, .focus text.deaths-base-text, .legend rect.deaths {
+  fill: rgb(86, 148, 202)
+}
+
+#cumulative-deaths {
+  /*fill: none;*/
+  /*stroke: rgb(0, 48, 120);*/
 }
 
 .focus-box {

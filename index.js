@@ -23,10 +23,6 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/location', async (req, res) => {
-    // getData();
-    // console.log(req.query);
-    // console.log(req.param);
-    
     // get the location from req
     // break down areatype and areaname?
     console.log(req.query)
@@ -58,6 +54,7 @@ const getData = async (location, dateType) => {
         "newCasesByPublishDate",
         "newCasesBySpecimenDate",
         "newDeathsByDeathDate",
+        "newDeathsByPublishDate",
         "cumDeathsByDeathDate",
         "newCasesByPublishDateRollingRate",
         "newCasesByPublishDateRollingSum",
@@ -157,7 +154,8 @@ function cleanData(data, dateType){
 
         // Cases - 1 = specimen date and 2 = publish date
         if (dateType == 1){
-            cases = curr.newCasesBySpecimenDate;            
+            cases = curr.newCasesBySpecimenDate;  
+            deaths = curr.newDeathsByDeathDate;
 
             if (curr.newCasesBySpecimenDateRollingRate === null){
                 rollingRate = 0;
@@ -166,7 +164,8 @@ function cleanData(data, dateType){
             }
 
         } else {
-            cases = curr.newCasesByPublishDate;            
+            cases = curr.newCasesByPublishDate;    
+            deaths = curr.newDeathsByPublishDate;
             if (curr.newCasesByPublishDateRollingRate === null){
                 rollingRate = 0;
             } else {
