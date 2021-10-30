@@ -1,6 +1,6 @@
 /*
-*    cases-data.js
-*    UK coronavirus case data
+*    deaths-data.js
+*    UK coronavirus deaths data
 */
 
 function renderDeathsChart(data){
@@ -90,9 +90,7 @@ function renderDeathsChart(data){
     let xAxisCall = d3.axisBottom(x)
         .tickValues(x.domain().filter(function(d,i){
             if (d.slice(8,10) === "01"){
-                // console.log(d)
                 return d3.timeFormat('%Y')(d)
-                // return i            
             }  
         }))
     
@@ -110,7 +108,6 @@ function renderDeathsChart(data){
         .tickFormat(function(d){ return d; });
     g.append("g")
         .attr("class", "y axis")
-        // .attr("stroke", "steelblue")
         .call(yAxisCall);
     
     // Y Axis2
@@ -157,12 +154,9 @@ function renderDeathsChart(data){
         .attr("class", "cumulative-deaths")
         .attr("stroke-width", 1.5)
         .attr("d", d3.line()
-
-        .x(function(d) { return x(d.date) })
-        // .y(function(d) { return y2(d.sevenDayAverage) })
-        .y(function(d) { return y(d.cumDeaths) })
+            .x(function(d) { return x(d.date) })
+            .y(function(d) { return y(d.cumDeaths) })
         )
-    
     
     /******************************** Tooltip Code ********************************/
     
@@ -189,7 +183,6 @@ function renderDeathsChart(data){
     focus.append("text")
         .attr("class", "deaths-line-text")
     
-
     let focusLegend = focus.append("g")
     
     let focusWidth = 150;
@@ -213,10 +206,7 @@ function renderDeathsChart(data){
     
     focusLegend.append("text")
         .attr("class", "deaths-focus-text focus-box")
-    
-    // focusLegend.append("text")
-    //     .attr("class", "rolling-focus-text focus-box")
-    
+
     focusLegend.append("text")
         .attr("class", "cum-deaths-focus-text focus-box")
     
@@ -225,7 +215,6 @@ function renderDeathsChart(data){
     
     let legend = g.append("g")
         .attr("class", "legend")
-        // .style("display", "none")
         .style("font-size", "10px")
         .attr("dy", ".1em")
         .attr("text-anchor", "start");
@@ -245,16 +234,6 @@ function renderDeathsChart(data){
         .attr("class", "daily-deaths deaths")
         .attr("transform", "translate("+ (xOffset + 20) + "," + (yOffset + 32.5) + ")")
         .text("Daily Deaths")
-    
-    // legend.append("circle")
-    //     .attr("class", "rolling-line-hover rolling")
-    //     .attr("r", 2.5)
-    //     .attr("transform", "translate("+ (xOffset + 10) + "," + (yOffset + 50) + ")")
-    
-    // legend.append("text")
-    //     .attr("class", "rolling-cases rolling")
-    //     .attr("transform", "translate("+ (xOffset + 20) + "," + (yOffset + 52.5) + ")")
-    //     .text("Rolling Rate per 100k")
     
     legend.append("circle")
         .attr("class", "deaths-line-hover deaths")
@@ -279,13 +258,11 @@ function renderDeathsChart(data){
             focus.select(".focus-legend-rect")
                 .classed("hidden", false)
             focus.style("display", null); 
-            // legend.style("display", null); 
         })
         .on("mouseout", function() { 
             focus.style("display", "none"); 
             focus.select(".focus-legend-rect")
                 .classed("hidden", true)
-            // legend.style("display", "none"); 
         })
         .on("mousemove", mousemove);
     
@@ -297,13 +274,7 @@ function renderDeathsChart(data){
         let y0 = coordinates[1];
         let i = Math.floor(x0*((cleanData.length-1)/width))
         let d = cleanData[i]
-        
-        // focus.select(".rolling-line-hover").attr("cx", x(d.date) )
-        // focus.select(".rolling-line-hover").attr("cy", y2(d.rollingRate))
-        // focus.select(".rolling-line-text").attr("x", x(d.date) )
-        // focus.select(".rolling-line-text").attr("y", y2(d.rollingRate) - 10)
-        // focus.select(".rolling-line-text").text(d.rollingRate.toFixed(1))
-    
+
         focus.select(".deaths-line-hover").attr("cx", x(d.date) )
         focus.select(".deaths-line-hover").attr("cy", y(d.cumDeaths))
         focus.select(".deaths-line-text").attr("x", x(d.date) )

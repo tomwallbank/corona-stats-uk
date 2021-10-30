@@ -48,21 +48,60 @@ const port = 3001;
 app.listen(port, () => console.log('Corona App listening on port', port));
 
 const getData = async (location, dateType) => {
+    console.log(location)
+    let data = []
 
-    const structure = [
-        "alertLevel",
-        "newCasesByPublishDate",
-        "newCasesBySpecimenDate",
-        "newDeathsByDeathDate",
-        "newDeathsByPublishDate",
-        "cumDeathsByDeathDate",
-        "newCasesByPublishDateRollingRate",
-        "newCasesByPublishDateRollingSum",
-        "newCasesBySpecimenDateRollingRate",
-        "newCasesBySpecimenDateChangePercentage",
-        "newCasesByPublishDateAgeDemographics"
+    // const structure1 = [
+    //     "alertLevel",
+    //     "newCasesByPublishDate",
+    //     "newCasesBySpecimenDate",
+    //     "newDeathsByDeathDate",
+    //     "newDeathsByPublishDate",
+    // ]
+    
+    // const structure2 = [
+    //     "cumDeathsByDeathDate",
+    //     "newCasesByPublishDateRollingRate",
+    //     "newCasesByPublishDateRollingSum",
+    //     "newCasesBySpecimenDateRollingRate",
+    //     "newCasesBySpecimenDateChangePercentage",
+    //     // "newCasesByPublishDateAgeDemographics"
+    // ]    
+
+    const dataFields = [
+        [
+            "cumDeathsByDeathDate",
+            "newCasesByPublishDateRollingRate",
+            "newCasesByPublishDateRollingSum",
+            "newCasesBySpecimenDateRollingRate",
+            "newCasesBySpecimenDateChangePercentage",
+            // "newCasesByPublishDateAgeDemographics"
+        ],
+        // [
+        //     "alertLevel",
+        //     "newCasesByPublishDate",
+        //     "newCasesBySpecimenDate",
+        //     "newDeathsByDeathDate",
+        //     "newDeathsByPublishDate",
+        // ]
     ]
+    console.log(dataFields.length) 
+    dataFields.forEach(async function(structure){
+    console.log("for each", "s:", structure, "l:", location, "d:", dateType)
+        let res = await fetchData(structure, location, dateType)
+        console.log("res", res)
+        data.push(...res)
+    })
+    console.log(data)
+    data.clean = await cleanData(data.body, dateType)
+    console.log(data.clean[0])
+    data.summary = await summary(data);
+    return data;
+};  // getData
 
+
+async function fetchData(structure, location, dateType){
+    console.log(structure, location, dateType)
     let structureString = "";
     structure.forEach(function(e){
         structureString += "metric" + "=" + e + "&";
@@ -82,14 +121,12 @@ const getData = async (location, dateType) => {
     } else if (status != 200){
         throw new Error(statusText);        
     } else {
-        console.log(data.length)
-        data.clean = await cleanData(data.body, dateType)
-        console.log(data.clean[0])
-    }
-
-    data.summary = await summary(data);
-    return data;
-};  // getData
+        console.log("data length:", data.length)
+        // data.clean = await cleanData(data.body, dateType)
+        // console.log(data.clean[0])
+        return data
+    }    
+}
 
 async function summary(data){
     // console.log("summary data");

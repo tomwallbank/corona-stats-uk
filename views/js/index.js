@@ -123,6 +123,7 @@ let width = 1000 - margin.left - margin.right,
                     removeAllChildNodes(document.getElementById("death-chart-area"))    
                     // UPDATE CHART
                     // drawChart(data.clean)
+                    // renderCombinedChart(data.clean)
                     renderCasesChart(data.clean)
                     renderDeathsChart(data.clean)
                     
